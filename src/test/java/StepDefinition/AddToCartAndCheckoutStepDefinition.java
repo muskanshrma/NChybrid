@@ -13,13 +13,24 @@ public class AddToCartAndCheckoutStepDefinition extends BaseClass{
         setup();
     }
 
-    @When("User adds a product to cart and checkout")
-    public void registrationDetails() throws IOException, InterruptedException {
-        pageFactory.getAddToCartAndCheckout().addToCart();
+    @When("User navigates to computer section and clicks on computer category")
+    public void MenuCategories() throws IOException, InterruptedException {
+        pageFactory.getAddToCartAndCheckout().selectCategory();
     }
 
-    @And("User registers with valid details and checkout the product")
-    public void user_is_registered() throws IOException {
+    @When("User sorts the products and apply filters")
+    public void SortFilterOptions() throws IOException, InterruptedException {
+        pageFactory.getAddToCartAndCheckout().sortAndFilter();
+    }
+
+    @When("User Adds item to cart and navigates to cart and checkout")
+    public void cartAndCheckout() throws IOException, InterruptedException {
+        pageFactory.getAddToCartAndCheckout().addProductToCart();
+    }
+
+    @When("User registers with valid details and checkout the product")
+    public void userRegistration() throws IOException {
+
         pageFactory.getAddToCartAndCheckout().registerUser();
     }
 
