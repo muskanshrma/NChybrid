@@ -30,6 +30,7 @@ public class AddToCartAndCheckout {
     By displayFilterValue = By.xpath("//option[@value='9']");
     By addToCart = By.xpath("(//button[contains(@class,'add-to-cart-button')])[1]");
     By shopCart = By.xpath("//a[contains(text(), 'shopping cart')]");
+    By cartItemVerify = By.xpath("//a[@class='product-name']");
     By orderQuantity = By.xpath("//input[@class='qty-input']");
     By terms = By.xpath("//input[@name='termsofservice']");
     By checkout = By.xpath("//button[@name='checkout']");
@@ -41,13 +42,7 @@ public class AddToCartAndCheckout {
     By UsCountry = By.xpath("//option[@value='1'][contains(text(),'United States')]");
     By state = By.xpath("//option[@value='52'][contains(text(),'Alaska')]");
     String billingDetails = "//input[@name='BillingNewAddress.%s']";
-    By cont = By.xpath("(//button[contains(text(), 'Continue')])[1]");
-    By continueButton1 = By.xpath("//button[contains(@onclick,'Billing.save()')]");
-    By continueButton2 = By.xpath("//button[contains(@class,'shipping-method-next-step-button')]");
-    By continueButton3 = By.xpath("//button[contains(@class,'shipping-method-next-step-button')]");
-    By continueButton4 = By.xpath("//button[contains(@class,'payment-method-next-step-button')]");
-    By continueButton5 = By.xpath("//button[contains(@class,'payment-info-next-step-button')]");
-    By confirm = By.xpath("//button[contains(@class,'confirm-order-next-step-button')]");
+    String continueButtons = "//button[@onclick='%s']";
     By orderPlacedVerification = By.xpath("//h1[contains(text(),'Thank you')]");
 
     public AddToCartAndCheckout(WebDriver driver) {
@@ -78,23 +73,25 @@ public class AddToCartAndCheckout {
         System.out.println("Total products: " + allProductsCount);
         for (WebElement allElements : allProducts) {
             String productName = allElements.getText();
-            System.out.println(productName);
+            System.out.println("Product name: " + productName);
         }
         List<WebElement> allProductsPrice = driver.findElements(productPrice);
         for (WebElement allElementPrice : allProductsPrice) {
             String productPrice = allElementPrice.getText();
-            System.out.println(productPrice);
+            System.out.println("Product price: " + productPrice);
         }
     }
     public void addProductToCart() throws InterruptedException{
-
-        driver.findElement(By.xpath(String.format(product,"Apple MacBook Pro 13-inch"))).click();
+        String item  = "Apple MacBook Pro 13-inch";
+        driver.findElement(By.xpath(String.format(product,item))).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(addToCart));
         driver.findElement(addToCart).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(shopCart));
         boolean isResultDisplayed = driver.findElement(shopCart).isDisplayed();
         Assert.assertTrue(isResultDisplayed, "Order not added to cart");
         driver.findElement(shopCart).click();
+        String actual = driver.findElement(cartItemVerify).getText();
+        Assert.assertEquals(actual, item, "Expected result does not match with actual result");
         driver.findElement(orderQuantity).clear();
         driver.findElement(orderQuantity).sendKeys("4");
         wait.until(ExpectedConditions.elementToBeClickable(terms));
@@ -142,19 +139,16 @@ public class AddToCartAndCheckout {
         driver.findElement(By.xpath(String.format(billingDetails, "Address1"))).sendKeys(add);
         driver.findElement(By.xpath(String.format(billingDetails, "ZipPostalCode"))).sendKeys(zipcode);
         driver.findElement(By.xpath(String.format(billingDetails, "PhoneNumber"))).sendKeys(num);
-        driver.findElement(cont).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(continueButton1));
-        driver.findElement(continueButton1).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(continueButton2));
-        driver.findElement(continueButton2).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(continueButton3));
-        driver.findElement(continueButton3).click();
-        wait.until(ExpectedConditions.elementToBeClickable(continueButton4));
-        driver.findElement(continueButton4).click();
-        wait.until(ExpectedConditions.elementToBeClickable(continueButton5));
-        driver.findElement(continueButton5).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(confirm));
-        driver.findElement(confirm).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(continueButtons, "Billing.save()"))));
+        driver.findElement(By.xpath(String.format(continueButtons, "Billing.save()"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(continueButtons, "ShippingMethod.save()"))));
+        driver.findElement(By.xpath(String.format(continueButtons, "ShippingMethod.save()"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(continueButtons, "PaymentMethod.save()"))));
+        driver.findElement(By.xpath(String.format(continueButtons, "PaymentMethod.save()"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(continueButtons, "PaymentInfo.save()"))));
+        driver.findElement(By.xpath(String.format(continueButtons, "PaymentInfo.save()"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(continueButtons, "ConfirmOrder.save()"))));
+        driver.findElement(By.xpath(String.format(continueButtons, "ConfirmOrder.save()"))).click();
     }
 
     public void verifyOrderPlaced() throws IOException {
